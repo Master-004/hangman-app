@@ -11,7 +11,6 @@ const wordLengths = {
 const Hangman = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-
   const difficulty = searchParams.get("difficulty") || "easy";
   const [word, setWord] = useState("");
   const [guesses, setGuesses] = useState<string[]>([]);
@@ -46,7 +45,7 @@ const Hangman = () => {
       });
   }, []); // only once
 
-  // Focus input on game updates
+  // Focus to input element if game is not over and not won
   useEffect(() => {
     if (!gameOver && !gameWon) inputRef.current?.focus();
   }, [inputValue, gameOver, gameWon]);
@@ -65,17 +64,17 @@ const Hangman = () => {
 
   // Handle guesses
   const handleGuess = () => {
-    const letter = inputValue.toUpperCase();
+    const letter = inputValue.toUpperCase(); // Convert to uppercase
 
-    if (!letter.match(/^[A-Z]$/)) return;
+    if (!letter.match(/^[A-Z]$/)) return; // Only allow letters A-Z
 
     if (word.includes(letter)) {
       if (!guesses.includes(letter)) {
-        setGuesses((prev) => [...prev, letter]);
+        setGuesses((prev) => [...prev, letter]); // Add to correct guesses
       }
     } else {
       if (!wrongGuesses.includes(letter)) {
-        setWrongGuesses((prev) => [...prev, letter]);
+        setWrongGuesses((prev) => [...prev, letter]); // Add to wrong guesses
         setAttemptsLeft((prev) => prev - 1);
       }
     }
@@ -107,11 +106,7 @@ const Hangman = () => {
         </span>
       </p>
 
-      <Gallows
-        wrongGuesses={wrongGuesses.length}
-        gameWon={gameWon}
-        gameOver={gameOver}
-      />
+      <Gallows wrongGuesses={wrongGuesses.length} gameOver={gameOver} />
 
       {!gameOver && !gameWon && (
         <div className="word-container">
@@ -146,7 +141,8 @@ const Hangman = () => {
       )}
       {gameWon && (
         <p>
-          Congratulations! You've guessed the word! <br /><b>{word}</b>
+          Congratulations! You've guessed the word! <br />
+          <b>{word}</b>
         </p>
       )}
 
@@ -167,3 +163,4 @@ const Hangman = () => {
 };
 
 export default Hangman;
+// // This component is the main game logic for the Hangman game. It fetches a random word based on the selected difficulty level, handles user input for letter guesses, and manages the game state (win/loss). It also provides visual feedback through the Gallows component and allows users to reset or change difficulty after the game ends.

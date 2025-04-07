@@ -1,10 +1,8 @@
 const Gallows = ({
   wrongGuesses,
-  gameWon,
   gameOver,
 }: {
   wrongGuesses: number;
-  gameWon: boolean;
   gameOver: boolean;
 }) => {
   const gallowsStages = [

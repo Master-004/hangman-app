@@ -36,4 +36,4 @@ const WelcomeScreen = () => {
   );
 };
 export default WelcomeScreen;
-// This component is a simple welcome screen for the Hangman game. It includes a title, some instructions, and a button to start the game. The button can be linked to the game logic in the main App component.
+// This component is a simple welcome screen for the Hangman game. It includes a title, some instructions, and a button to start the game. The button is linked to the game logic in the hangman component.
