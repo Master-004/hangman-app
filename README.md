@@ -1,54 +1,51 @@
-# React + TypeScript + Vite
+# Hangman App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is a simple and interactive Hangman game built using React, TypeScript, and Vite. Users select a difficulty level and then try to guess the randomly selected word one letter at a time. The game features real-time visual feedback and support for dark mode.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## How to Run Locally
 
-## Expanding the ESLint configuration
+### 1. Clone the Repository
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```bash
+git clone https://github.com/your-username/hangman-app.git
+cd hangman-app
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+### 2. Install Dependencies
+Make sure you have Node.js installed. Then run:
+```bash
+npm install
 ```
+
+### 3. Start the Development Server
+```bash
+npm run dev
+```
+  - Once started, open your browser and go to:
+    - http://localhost:5173
+
+# Features
+- Selectable difficulty levels: Easy (4-letter), Medium (7-letter), Hard (10-letter)
+- Dynamic gallows drawing updates as you guess
+- Dark mode support (automatically enabled based on system settings)
+- Win/loss tracking with "Play Again" and "Change Difficulty" buttons
+- Words fetched from an external word API
+
+
+# API Used
+This app uses the following public API to fetch random words:
+https://random-word.ryanrk.com/api/en/word/random/10/?length=7
+- The word length is adjusted dynamically based on the selected difficulty.
+
+
+# Notes
+- You can emulate dark mode using browser DevTools:
+  - Chrome: Open DevTools → Command Palette (Ctrl+Shift+P) → "Show Rendering" → Select dark mode under "Emulate CSS media feature prefers-color-scheme"
+- The project uses Bootstrap for layout and styling.
+- If the API is unavailable, the app falls back to a default word.
+
+
+# Acknowledgments
+This app was developed as a learning project using React and TypeScript. Special thanks to the creators of the random-word API used in this project.
