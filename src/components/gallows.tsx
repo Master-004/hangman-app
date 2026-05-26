@@ -19,7 +19,7 @@ const Gallows = ({
     return <pre>{gallowsStages[6]}</pre>;
   }
 
-  return <pre>{gallowsStages[wrongGuesses]}</pre>;
+  return <pre>{gallowsStages[Math.min(wrongGuesses, 6)]}</pre>;
 };
 
 export default Gallows;

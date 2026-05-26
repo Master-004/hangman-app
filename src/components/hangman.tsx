@@ -19,31 +19,48 @@ const Hangman = () => {
   const [gameOver, setGameOver] = useState(false);
   const [gameWon, setGameWon] = useState(false);
   const [inputValue, setInputValue] = useState("");
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(true);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Fetch word only once when component mounts
-  useEffect(() => {
-    const length = wordLengths[difficulty as keyof typeof wordLengths] || 4;
+  const fetchWord = (diff: string) => {
+    const length = wordLengths[diff as keyof typeof wordLengths] || 4;
+    setLoading(true);
+    setWord("");
+    setGuesses([]);
+    setWrongGuesses([]);
+    setAttemptsLeft(7);
+    setGameOver(false);
+    setGameWon(false);
+    setMessage("");
 
-    fetch(
-      `https://random-word.ryanrk.com/api/en/word/random/10/?length=${length}`
-    )
+    // Datamuse: sp=???? matches words of exactly `length` letters
+    const pattern = "?".repeat(length);
+    fetch(`https://api.datamuse.com/words?sp=${pattern}&max=10`)
       .then((res) => res.json())
-      .then((data) => {
+      .then((data: { word: string }[]) => {
+        if (!data || data.length === 0) throw new Error("No words returned");
+        const validWords = data
+          .map((item) => item.word)
+          .filter((w) => /^[a-zA-Z]+$/.test(w));
+        if (validWords.length === 0) throw new Error("No valid words in batch");
         const randomWord =
-          data[Math.floor(Math.random() * data.length)].toUpperCase();
+          validWords[Math.floor(Math.random() * validWords.length)].toUpperCase();
         setWord(randomWord);
-        setGuesses([]);
-        setWrongGuesses([]);
-        setAttemptsLeft(7);
-        setGameOver(false);
-        setGameWon(false);
       })
       .catch((err) => {
         console.error("Error fetching word:", err);
-        setWord("REACT"); // fallback word
+        setWord("REACT");
+      })
+      .finally(() => {
+        setLoading(false);
       });
-  }, []); // only once
+  };
+
+  // Fetch word only once when component mounts
+  useEffect(() => {
+    fetchWord(difficulty);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Focus to input element if game is not over and not won
   useEffect(() => {
@@ -52,6 +69,8 @@ const Hangman = () => {
 
   // Check win/loss condition
   useEffect(() => {
+    if (!word) return;
+
     if (attemptsLeft <= 0) {
       setGameOver(true);
     }
@@ -62,29 +81,42 @@ const Hangman = () => {
     }
   }, [guesses, attemptsLeft, word]);
 
+  // Auto-clear the feedback message after 1.5 s
+  useEffect(() => {
+    if (!message) return;
+    const timer = setTimeout(() => setMessage(""), 1500);
+    return () => clearTimeout(timer);
+  }, [message]);
+
   // Handle guesses
   const handleGuess = () => {
-    const letter = inputValue.toUpperCase(); // Convert to uppercase
+    const letter = inputValue.toUpperCase();
 
-    if (!letter.match(/^[A-Z]$/)) return; // Only allow letters A-Z
+    if (!letter.match(/^[A-Z]$/)) {
+      setMessage("Please enter a valid letter (A–Z).");
+      setInputValue("");
+      return;
+    }
+
+    if (guesses.includes(letter) || wrongGuesses.includes(letter)) {
+      setMessage(`You already guessed "${letter}".`);
+      setInputValue("");
+      return;
+    }
 
     if (word.includes(letter)) {
-      if (!guesses.includes(letter)) {
-        setGuesses((prev) => [...prev, letter]); // Add to correct guesses
-      }
+      setGuesses((prev) => [...prev, letter]);
     } else {
-      if (!wrongGuesses.includes(letter)) {
-        setWrongGuesses((prev) => [...prev, letter]); // Add to wrong guesses
-        setAttemptsLeft((prev) => prev - 1);
-      }
+      setWrongGuesses((prev) => [...prev, letter]);
+      setAttemptsLeft((prev) => prev - 1);
     }
 
     setInputValue("");
+    setMessage("");
   };
 
-  // Reset the game (same difficulty)
   const resetGame = () => {
-    window.location.reload(); // refetch from API with same difficulty
+    fetchWord(difficulty);
   };
 
   return (
@@ -108,7 +140,9 @@ const Hangman = () => {
 
       <Gallows wrongGuesses={wrongGuesses.length} gameOver={gameOver} />
 
-      {!gameOver && !gameWon && (
+      {loading && <p>Loading word…</p>}
+
+      {!loading && !gameOver && !gameWon && (
         <div className="word-container">
           <p>
             {word
@@ -117,6 +151,8 @@ const Hangman = () => {
               .join(" ")}
           </p>
           <p>Wrong letters: {wrongGuesses.join(", ")}</p>
+
+          {message && <p className="text-warning">{message}</p>}
 
           <input
             ref={inputRef}
@@ -163,4 +199,3 @@ const Hangman = () => {
 };
 
 export default Hangman;
-// // This component is the main game logic for the Hangman game. It fetches a random word based on the selected difficulty level, handles user input for letter guesses, and manages the game state (win/loss). It also provides visual feedback through the Gallows component and allows users to reset or change difficulty after the game ends.
